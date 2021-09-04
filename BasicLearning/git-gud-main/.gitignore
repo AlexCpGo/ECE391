@@ -1,0 +1,9 @@
+.idea/
+**/__pycache__/
+git_gud.egg-info/
+dist/
+build/
+.vscode
+.python/
+venv/
+**.pyc

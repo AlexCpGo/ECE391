@@ -1,0 +1,19 @@
+"git gud explain" will help give you more context to the currrent level
+Hit enter to read more.
+>>>
+As long as you see the ">>>", you are reading the explanation.
+More text appears each time you hit enter, can once explanation finishes, you can type commands again.
+>>>
+As you progress, "git gud" will guide you through the relevant commands in both "git" and "git gud".
+>>>
+The first command we'll introduce you to is "git gud commit".
+ "git gud commit" is a special command that does does three things.
+  1) It creates a new file
+  2) It adds that file to git
+  3) It commits the new file
+ Whenever git gud does something for you, it will let you know what actions/commands it is simulating.
+>>>
+Now look below. Since there's no more ">>>", we're back in the normal command line, and you can type in commands again.
+
+To complete this level, commit twice using "git gud commit"
+When you're done, run "git gud test" to see if you've completed this level.
