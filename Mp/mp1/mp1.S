@@ -435,12 +435,12 @@ mp1_ioctl_movexhairs:
 	cmpl	$0, crosshairs_x
 	jl		movexhairs_xTooSmall
 	jmp		movexhairs_checkY
-movexhairs_xTooBig:
+movexhairs_xtooBig:
 	movl	$79, crosshairs_x
 	jmp		movexhairs_checkY
-
-movexhairs_xTooSmall:
+movexhairs_xtooSmall:
 	movl	$0, crosshairs_x
+
 movexhairs_checkY:
 	addl	%ecx, crosshairs_y
 	cmpl	$24, crosshairs_y
