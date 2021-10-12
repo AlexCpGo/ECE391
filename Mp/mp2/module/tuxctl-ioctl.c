@@ -29,11 +29,9 @@
 #define debug(str, ...) \
 	printk(KERN_DEBUG "%s: " str, __FUNCTION__, ## __VA_ARGS__)
 
-
-
-
-/*************************global variables*********************************/
+/*************************Global Variables Declaration*********************/
 static unsigned int ack_or_not;
+
 struct tux_buttons
 {
 	spinlock_t buttons_lock;
@@ -48,7 +46,7 @@ unsigned a, b, c;
 
 
 
-/************************loacl function declaration************************/
+/************************Loacl Function Declaration************************/
 
 int tuxctl_ioctl_tux_init(struct tty_struct* tty);
 int tuxctl_ioctl_tux_buttons(struct tty_struct* tty, unsigned long arg);
@@ -56,6 +54,7 @@ int tuxctl_ioctl_tux_set_led (struct tty_struct* tty, unsigned long arg);
 int tuxctl_ioctl_tux_led_request(struct tty_struct* tty);
 int tuxctl_ioctl_tux_read_led (struct tty_struct* tty, unsigned long arg);
 int tuxtl_handle_get_button(unsigned b, unsigned c);
+
 /************************ Protocol Implementation *************************/
 
 /* tuxctl_handle_packet()
@@ -65,14 +64,12 @@ int tuxtl_handle_get_button(unsigned b, unsigned c);
  */
 void tuxctl_handle_packet (struct tty_struct* tty, unsigned char* packet)
 {
-	if(busy)
-		return;
+    unsigned a, b, c;
 
     a = packet[0]; /* Avoid printk() sign extending the 8-bit */
     b = packet[1]; /* values when printing them. */
     c = packet[2];
-
-    //printk("packet : %x %x %x\n", a, b, c);
+    
     switch(a)
     {
      	case MTCP_ACK:
@@ -92,6 +89,7 @@ void tuxctl_handle_packet (struct tty_struct* tty, unsigned char* packet)
 		 default:
 		 	return;
      }
+    /*printk("packet : %x %x %x\n", a, b, c); */
 }
 
 /******** IMPORTANT NOTE: READ THIS BEFORE IMPLEMENTING THE IOCTLS ************
@@ -111,8 +109,7 @@ int
 tuxctl_ioctl (struct tty_struct* tty, struct file* file, 
 	      unsigned cmd, unsigned long arg)
 {
-    switch (cmd) 
-    {
+    switch (cmd) {
 		case TUX_INIT:
 			return  tuxctl_ioctl_tux_init(tty);
 		case TUX_BUTTONS:
@@ -130,15 +127,15 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
     }
 }
 
-/*********************implementation of local functions*************************/
+/*********************Implementation of Local Functions*************************/
 
 /*
- *tuxctl_ioctl_tuxinit
- *DESCRIPTION: Initialize the TUX Controller
- *Input: tty - a pointer to a tty_struct type argument, used for tuxctl_ldisc_put
- *Output: None
- *Return Value: Always 0 (success)
- *Side Effects: Same as description
+ * tuxctl_ioctl_tuxinit
+ *	DESCRIPTION: Initialize the TUX Controller
+ *	Input: tty - the pointer to a tty_struct type argument (for tuxctl_ldisc_put)
+ *	Output: None
+ *	Return Value: 0 - success
+ *	Side Effects: None
  */
  int tuxctl_ioctl_tux_init(struct tty_struct* tty)
  {
@@ -146,13 +143,12 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
 
  	ack_or_not = 0;
  	
- 	//Enable Button interrupt-on-change.
+ 	/*Enable Button interrupt-on-change.*/
  	write_value[0] = MTCP_BIOC_ON;
- 	//Put the LED display into user-mode.
+ 	/*Make the LED display into user-mode.*/
  	write_value[1] = MTCP_LED_USR;
 
  	tuxctl_ldisc_put(tty, &write_value[0], 1);
- 	//usleep(1000);
  	tuxctl_ldisc_put(tty, &write_value[1], 1);
 
  	//initialize led_status and buttons
@@ -164,32 +160,32 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
  }
 
 /*
- *tuxctl_ioctl_set_led
- *DESCRIPTION: Display the data specified by arg to LED on TUX Controller
- *Input: tty - a pointer to a tty_struct type argument, used for tuxctl_ldisc_put
- *       arg - The argument is a 32-bit integer of the following form: 
+ * tuxctl_ioctl_set_led
+ *	DESCRIPTION: Display the data specified by arg to LED on TUX Controller
+ *	Input: tty - a pointer to a tty_struct type argument, used for tuxctl_ldisc_put
+ *         arg - The argument is a 32-bit integer of the following form: 
  *			   The low 16-bits specify a number whose hexadecimal value is to be 
  *			   displayed on the 7-segment displays. The low 4 bits of the third byte 
- *			   specifies which LEDâ€™s should be turned on. The low 4 bits of the 
+ *			   specifies which LED¡¯s should be turned on. The low 4 bits of the 
  *			   The low 4 bits of the highest byte (bits 27:24) specify whether the 
  *			   corresponding decimal points should be turned on. 
- *Output: None
- *Return Value: Always 0 (success)
- *Side Effects: Same as description
+ *	Output: None
+ *	Return Value: 0 - success
+ *	Side Effects: None
  */
  int tuxctl_ioctl_tux_set_led (struct tty_struct* tty, unsigned long arg)
  {
  	unsigned char display_value[4];
  	unsigned char leds_on;
  	unsigned char dp;
- 	unsigned int  i;		//general index
+ 	unsigned int  i;		
  	unsigned long bitmask; 
  	unsigned char buffer_to_send[6];
  	if(!ack_or_not)
  		return -1;
  	
  	ack_or_not = 0;
- 	//extract information from arg
+ 	/*get information from arg*/
  	bitmask = 0x000F;
  	for(i = 0; i < 4; ++i, bitmask <<= 4)
  	{
@@ -199,12 +195,11 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
  	leds_on = (arg & (0x0F << 16)) >> 16;
  	dp = (arg & (0x0F << 24)) >> 24;
 
- 	//Put the LED display into user-mode.
+ 	/*Put the LED display into user-mode.*/
  	buffer_to_send[0] = MTCP_LED_USR;
  	tuxctl_ldisc_put(tty, &buffer_to_send[0], 1);
 
- 	//put data into buffer_to_send
- 	//opcode
+ 	/*put data into buffer_to_send*/
  	buffer_to_send[0] = MTCP_LED_SET;
  	buffer_to_send[1] = 0x0F;
 
@@ -224,11 +219,11 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
  			buffer_to_send[2 + i] = 0x0;
  		}
  	}
- 	//save the current led_status
+ 	/*save the current led_status*/
  	led_status = arg;
 
 
- 	//send the buffer to TUX Controller
+ 	/*send the buffer to TUX Controller*/
  	tuxctl_ldisc_put(tty, buffer_to_send, 6);
 
 	return 0;
@@ -236,13 +231,13 @@ tuxctl_ioctl (struct tty_struct* tty, struct file* file,
 
 
 /*
- *tuxctl_ioctl_tux_buttons
- *DESCRIPTION: put the status of button to arg
- *INPUT: tty - a pointer to a tty_struct type argument, used for tuxctl_ldisc_put
- 		 arg - where to put the status of button
- *OUPUT: None
- *Return Value: 0 if success
- *Side Effects: None
+ * tuxctl_ioctl_tux_buttons
+ *	DESCRIPTION: put the status of button to arg
+ *	INPUT: tty - a pointer to a tty_struct type argument, used for tuxctl_ldisc_put
+ 		   arg - where to put the status of button
+ *	OUPUT: None
+ *	Return Value: 0 if success
+ *	Side Effects: None
  */
 int tuxctl_ioctl_tux_buttons(struct tty_struct* tty, unsigned long arg)
 {
@@ -251,15 +246,13 @@ int tuxctl_ioctl_tux_buttons(struct tty_struct* tty, unsigned long arg)
 	int ret;
 	buttons_ptr = &(button_status.buttons);
 
-	
-
-	//check lock
+	/*check the spin_lock*/
 	spin_lock_irqsave(&(button_status.buttons_lock), flags);
 
 	//copy to user space
 	ret = copy_to_user((void *)arg, (void *)buttons_ptr, sizeof(long));
 
-	//unlock
+	/*unlock*/
 	spin_unlock_irqrestore(&(button_status.buttons_lock), flags);
 
 	if (ret > 0)
@@ -270,13 +263,13 @@ int tuxctl_ioctl_tux_buttons(struct tty_struct* tty, unsigned long arg)
 
 }
 /*
- *tuxtl_handle_get_button
- *DESCRIPTION: the function get the status of button and save in buttons
- *INPUT: b - have the value of XXXXCBAS (X stands for not use)
+ * tuxtl_handle_get_button
+ *	DESCRIPTION: the function get the status of button and save in buttons
+ *	INPUT: b - have the value of XXXXCBAS (X stands for not use)
  *		 c - have the value of XXXXRDLU
- *OUPUT: None
- *Return Value: Always 0 (success)
- *Side Effects: change the lowest byte of global variable button to RLDUCBAS
+ *	OUPUT: None
+ *	Return Value: Always 0 (success)
+ *	Side Effects: change the lowest byte of global variable button to RLDUCBAS
  */
 int tuxtl_handle_get_button(unsigned b, unsigned c)
 {
@@ -290,16 +283,15 @@ int tuxtl_handle_get_button(unsigned b, unsigned c)
 	status_of_L = (c & 0x02) >> 1;
 	status_of_D = (c & 0x04) >> 2;
 
-	//check lock
+	/*check the spin_lock*/
 	spin_lock_irqsave(&(button_status.buttons_lock), flags);
 
 	//take the last four bits of b and c and put them into buttons
-	//reassign the value of L and D
+	//retake the value of L and D
 	button_status.buttons = ~((((b & 0x0F) | ((c & 0x0F) << 4)) & 0x9F) 
 				| (status_of_D << 5) | (status_of_L << 6));
-	//unlock
+	/*unlock*/
 	spin_unlock_irqrestore(&(button_status.buttons_lock), flags);
 
-	
 	return 0;
 }
