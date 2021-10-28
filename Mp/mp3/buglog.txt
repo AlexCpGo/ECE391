@@ -1,0 +1,35 @@
+/* ------------------------------------Checkpoints 3.1--------------------------------*/
+1. Syntax errors: 
+Lack of expected syntax symbol in line 26 of rtc.c making rtc.o ERROR 1
+
+2. Address errors:
+Pointed to a NULL address of in line 30 kernel.c ERROR 127
+
+3. tests.c:84 void value not ignored as it ought to be
+
+4.  test for rtc:
+(1) inproper pointer in rtc.c
+
+5.  test for keyboard
+(1) test machine halt and close automatically：
+     Fix way: reload the mp3.img (due to the bugs destroyed the img before)
+(2) Unbale to enter the input: 
+     Fix way: Uncomment line 166 and 167 in kernel.c (sti() to allow interrupt);
+(3) General Exception occur after input the key
+     Fix way: Edit the IDT to add the keyboard irq
+(4) Unexpected additional key appears: (possibly some emo key???)
+     Fix way: add a judgement in keyboard.c: line 23
+
+/* ----------------------------------Checkpoints 3.2---------------------------------*/
+Test for fs:
+1. Problem: Warning: In function "ls_test" of test.c:207, "display_file_content": pointer targets in initialization differ in signedness
+    Solution: changing type the pointer to file from uint32_t to int32_t 
+
+2. Problem: Error: Page Fault exception occured when merging terminal, rtc and file system
+    Solution: Making agreement on the extern parameter defined buffer/buf to buffer in terminal.h
+
+3. Problem: Failure to enter "q" to quit in the test cat of file system
+    Solution: Changing checking the condition to quit the while loop in test.c line 287 from "q\n" to "q". 
+
+
+
