@@ -1,38 +1,34 @@
-#include "types.h"
-
 #ifndef __KEYBOARD_H__
 #define __KEYBOARD_H__
 
 #define NUM_KEYS 80
 #define KEYBOARD_DATA 0x60
-#define CAPS_LOCK_KEY 0x3A
-#define CTRL_KEY_PRESSED 0x1D
-#define CTRL_KEY_RELEASE 0x9D
-#define LEFT_SHIFT_KEY_PRESSED 0x2A
-#define LEFT_SHIFT_KEY_RELEASE 0xAA
-#define RIGHT_SHIFT_KEY_PRESSED 0x36
-#define RIGHT_SHIFT_KEY_RELEASE 0xB6
-#define ALT_KEY_PRESSED 0x38
-#define ALT_KEY_RELEASE 0xB8
 
-#define BACKSPACE_PRESSED 0x0E
-#define BACKSPACE_RELEASE 0x8E
-#define L_KEY 0x26
-#define ENTER_KEY 0x1C
+// special key codes
+#define MODIFIER 0x80
 
+#define BACKSPACE 0x0E
+#define TAB 0x0F
+#define ENTER 0x1C
 
-extern void keyboard_init();
-extern void keyboard_interrupt();
-int update_modifier_key(unsigned char key);
+#define CTRL_DOWN 0x1D
+#define LSHIFT_DOWN 0x2A
+#define RSHIFT_DOWN 0x36
+#define ALT_DOWN 0x38
 
-// apparrently C does not have boolean data type, so use int for keeping track of true or false
-int CTRL;
-int CAPS;
-int SHIFT;
-int ALT;
-int modifier_key;
-int ENTER;
-int BACKSPACE;
+#define SPACE_DOWN 0x39
 
+#define CAPS_LOCK 0x3A
+#define F1 0x3B
+#define F2 0x3C
+#define F3 0x3D
+
+#define CTRL_UP (CTRL_DOWN | MODIFIER)
+#define LSHIFT_UP (LSHIFT_DOWN | MODIFIER)
+#define RSHIFT_UP (RSHIFT_DOWN | MODIFIER)
+#define ALT_UP (ALT_DOWN | MODIFIER)
+
+void keyboard_init();
+void keyboard_interrupt();
 
 #endif

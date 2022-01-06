@@ -8,6 +8,7 @@
 #include "i8259.h"
 #include "debug.h"
 #include "tests.h"
+#include "system_execute_c.h"
 
 /* Self definded header files */
 #include "idt.h"
@@ -16,6 +17,8 @@
 #include "rtc.h"
 #include "terminal.h"
 #include "fs.h"
+#include "pit.h"
+#include "scheduler.h"
 
 #define RUN_TESTS
 
@@ -154,22 +157,19 @@ void entry(unsigned long magic, unsigned long addr) {
     idt_init();
     /* Init the keybord */
     keyboard_init();
-    /* Init the RTC */
-    rtc_init();
     /* Init the terminal */
     terminal_init();
+    /* Init the RTC */
+    rtc_init();
     // init fs
     uint32_t base_addr = ((module_t*)(mbi->mods_addr))->mod_start;
     init_fs((void*)base_addr);
     /* Init the page */
     page_init();
+    /* Init PIT */
+    // running_terminal = cur_terminal;
+    pit_init();
     
-
-    
-    
-
-//    rtc_open();
-
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your
      * IDT correctly otherwise QEMU will triple fault and simple close
@@ -179,17 +179,18 @@ void entry(unsigned long magic, unsigned long addr) {
 
 #ifdef RUN_TESTS
     /* Run tests */
-    launch_tests();
+    // launch_tests();
     // uint8_t buffer[BUFFER_SIZE];
     
-    uint8_t buff[BUFFER_SIZE];
-    while(1){
-        read_terminal(0, (void*) buff, BUFFER_SIZE);
-        write_terminal(1,(void*) buff, BUFFER_SIZE);
-    }
+    // uint8_t buff[BUFFER_SIZE];
+    // while(1){
+    //     read_terminal(0, (void*) buff, BUFFER_SIZE);
+    //     write_terminal(1,(void*) buff, BUFFER_SIZE);
+    // }
 #endif
     /* Execute the first program ("shell") ... */
-
+    //printf("goes to execute");
+    execute((uint8_t *)"shell");
     // unsigned char * temp;
     // *temp = 0x03;
     // rtc_write(temp);

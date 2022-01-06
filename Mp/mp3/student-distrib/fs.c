@@ -1,5 +1,6 @@
 #include "lib.h"
 #include "fs.h"
+#include "system_execute_c.h"
 
 // boot block addr
 boot_block_t* boot_block;
@@ -134,10 +135,20 @@ int32_t file_open(const uint8_t* filename) {
  *  DESCRIPTION: this function is to read the file
  *  INPUT: fd, buf, nbytes
  *  OUTPUT: 0
- *  SIDE EFFECTS: no thread using it
+ *  SIDE EFFECTS: reads the file and stores it intothe corresponding PCB
 */
 int32_t file_read(int32_t fd, void* buf, int32_t nbytes) {
-    return 0;
+    PCB* pcb = get_current_process();
+    fd_table_entry* file = &pcb->fd_array[fd];
+    if (file->flags == INACTIVE)
+        return -1;
+    
+    uint32_t inode = file->inode;
+    uint32_t off = file->file_position;
+    int32_t read_len = read_data(inode, off, (uint8_t*)buf, nbytes);
+    if (read_len > 0)
+        file->file_position += read_len;
+    return read_len;
 }
 
 
@@ -194,8 +205,9 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes) {
 
     uint32_t len = FILENAME_LEN < nbytes ? FILENAME_LEN : nbytes;
     char* c_buf = buf;
-    strncpy(c_buf, boot_block->dir_entries[cur_dir].filename, len);
+    strncpy((void*)c_buf, boot_block->dir_entries[cur_dir].filename, len);
     c_buf[len] = '\0';
+    strncpy(buf, (void *)c_buf, len + 1);
     cur_dir++; // next call should read the next dir
     return len;
 }

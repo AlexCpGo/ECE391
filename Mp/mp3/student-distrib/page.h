@@ -8,7 +8,7 @@
 #define SIZE_4MB (SIZE_4KB << 10)
 
 #define OFFSET 12
-#define VID_ADDR 0xB8
+#define VID_ADDR 0xB8000
 
 typedef struct PDE_MB {
   uint32_t p : 1;
@@ -63,5 +63,6 @@ PDE_t page_directory[NUM_ENTRIES] __attribute__((aligned(SIZE_4KB)));
 PTE_t page_table[NUM_ENTRIES] __attribute__((aligned(SIZE_4KB)));
 
 extern void page_init();
-
+extern void map_4mb_to_pd(uint32_t virt_addr, uint32_t phys_addr);
+extern void map_4kb(uint32_t va, uint32_t pa);
 #endif  // __PAGING_H__

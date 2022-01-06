@@ -8,6 +8,8 @@
 #define _TYPES_H
 
 #define NULL 0
+#define SIZE_128MB 0x08000000
+#define SIZE_8MB 0x0800000
 
 #ifndef ASM
 

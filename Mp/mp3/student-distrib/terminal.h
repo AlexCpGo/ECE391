@@ -1,40 +1,50 @@
 #ifndef __TERMINAL_H__
 #define __TERMINAL_H__
 
-#include "lib.h"
 #include "types.h"
-#include "keyboard.h"
 
-#define BUFFER_SIZE 128
-#define VGA_WIDTH 80
+#define TERMINAL_BUF_SIZE 128
+#define NUM_TERMINALS 3
+#define INIT_BLANK -1
 
-extern int32_t read_terminal(int32_t fd, void* buf, int32_t nbytes);
-extern int32_t write_terminal(int32_t fd, const void* buf, int32_t nbytes);
-extern int32_t open_terminal(const uint8_t * filename);
-extern int32_t close_terminal(int32_t fd);
+// struct for the terminal and buffer information
+typedef struct terminal {
+  int32_t id;
+  int32_t pid;  // pid of running program
 
+  int32_t cx, cy;  // cursor position
+  char* vid_mem;   // video mem backup location
 
-extern void terminal_init();
-extern void clear_buffer();
-extern void clear_buffer_screen(void* buf);
-extern void set_cursor(int x, int y);
-//extern void update_cursor(int x, int y);
+  int enter_pressed;  // enter pressed signal from kbd
+  char buf[TERMINAL_BUF_SIZE];
+  int tot_running_process;
+  uint8_t buf_pos;
 
-uint8_t buffer[BUFFER_SIZE];
-int num_bytes;
-int char_printed;
-int counter;
-int flag;
+  uint32_t rtc_frequency;
+} terminal_t;
+
+extern terminal_t* cur_terminal;
+extern terminal_t* running_terminal;
+extern terminal_t terminals[];
+
+void terminal_init();
+
+// open terminal
+int32_t open_terminal(const uint8_t* filename);
+
+// close a terminal
+int32_t close_terminal(int32_t fd);
+
+// read the terminal input
+int32_t read_terminal(int32_t fd, void* buf, int32_t nbytes);
+
+// write to the terminal
+int32_t write_terminal(int32_t fd, const void* buf, int32_t nbytes);
+
+// clear the contents of the buffer
+void clear_buffer(terminal_t* term);
+
+// switch to terminal
+void switch_to_terminal(int32_t id);
+
 #endif
-
-//scrolling is a for loop of memcpy 
-// 25 rows, 80 columns
-// then clear the bottom line
-
-//BACKSPACE
-// keyboard buffer need to have the character wiped
-//screen position changed
-//replace with blank character
-//handle with new line as well
-//handle when it is at the end (size is already 0)
-//need to handle wrapping as well

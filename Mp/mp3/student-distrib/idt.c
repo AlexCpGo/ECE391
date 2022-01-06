@@ -6,6 +6,7 @@
 #include "lib.h"
 #include "x86_desc.h"
 #include "interrupt_handlers.h"
+#include "system_execute_c.h"
 
 void idt_init(){
 	/*Construct the IDT Entries*/
@@ -24,6 +25,7 @@ void idt_init(){
 		
 		if(i == 0x80){ // for systems call -- not defined yet
 			idt[i].dpl = 3;
+			
 		}
 
 		// if(i == 15 || ((i > 20) && (i < 30)) || i == 31 ){
@@ -49,6 +51,11 @@ void idt_init(){
 			SET_IDT_ENTRY(idt[i], handle_rtc);
 			idt[i].reserved3 = 0;
 		}
+
+		if (i == pit_idt) {
+			SET_IDT_ENTRY(idt[i], handle_pit);
+			idt[i].reserved3 = 0;
+		}
 	}
 
 	SET_IDT_ENTRY(idt[0], DE_exception);
@@ -72,98 +79,122 @@ void idt_init(){
 	SET_IDT_ENTRY(idt[19], XM_exception);
 	SET_IDT_ENTRY(idt[20], VE_exception);
 	SET_IDT_ENTRY(idt[30], SX_exception);
-	
+	SET_IDT_ENTRY(idt[0x80], handle_system_call);
+
+
 	/* to be linked once keyboard is completed*/
 	// SET_IDT_ENTRY(idt[keyboard], keyboard handler);
 	
 }
 
 void DE_exception() {
-printf("Divide-by-zero exception occured");
-while(1);
+	printf("Divide-by-zero exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void DB_exception() {
-printf("Debug exception occured");
-while(1);
+	printf("Debug exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void NMI_exception() {
-printf("NON-maskable Interrupt exception occured");
-while(1);
+	printf("NON-maskable Interrupt exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void BP_exception() {
-printf("Breakpoint exception occured");
-while(1);
+	printf("Breakpoint exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void OF_exception() {
-printf("Overflow exception occured");
-while(1);
+	printf("Overflow exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void BR_exception() {
-printf("Bound Range Exceeded exception occured");
-while(1);
+	printf("Bound Range Exceeded exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void UD_exception() {
-printf("Invalid Opcode exception occured");
-while(1);
+	printf("Invalid Opcode exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void NM_exception() {
-printf("Device Not Available exception occured");
-while(1);
+	printf("Device Not Available exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void DF_exception() {
-printf("Double Fault exception occured");
-while(1);
+	printf("Double Fault exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void CSO_exception() {
-printf("Coprocessor Segment Overrun exception occured");
-while(1);
+	printf("Coprocessor Segment Overrun exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void TS_exception() {
-printf("Invalid TSS exception occured");
-while(1);
+	printf("Invalid TSS exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void NP_exception() {
-printf("Segment Not Present exception occured");
-while(1);
+	printf("Segment Not Present exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void SS_exception() {
-printf("Stack-Segment Fault exception occured");
-while(1);
+	printf("Stack-Segment Fault exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void GP_exception() {
-printf("General Protection Fault exception occured");
-while(1);
+	printf("General Protection Fault exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void PF_exception() {
-printf("Page Fault exception occured");
-while(1);
+	printf("Page Fault exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void MF_exception() {
-printf("x87 Floating-Point Exception exception occured");
-while(1);
+	printf("x87 Floating-Point Exception exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void AC_exception() {
-printf("Alignment Check exception occured");
-while(1);
+	printf("Alignment Check exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void MC_exception() {
-printf("Machine Check exception occured");
-while(1);
+	printf("Machine Check exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void XM_exception() {
-printf("SIMD Floating-Point Exception occured");
-while(1);
+	printf("SIMD Floating-Point Exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void VE_exception() {
-printf("Virtualization Exception occured");
-while(1);
+	printf("Virtualization Exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void SX_exception() {
-printf("Security Exception occured");
-while(1);
+	printf("Security Exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 void General_exception() {
-printf("General Exception occured");
-while(1);
+	printf("General Exception occured");
+	exception_flag = 1;
+	halt(1);
 }
 

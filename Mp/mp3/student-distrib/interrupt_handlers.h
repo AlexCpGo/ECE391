@@ -6,6 +6,7 @@
 //extern void handle_rtc();
 extern void handle_keyboard();
 extern void handle_rtc();
+extern void handle_pit();
 
 #endif  // ASM
 

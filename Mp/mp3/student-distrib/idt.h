@@ -7,6 +7,8 @@ vim:ts=4 noexpandtab
 
 #define keyboard_irq 33
 #define rtc_irq      40
+#define pit_idt 0x20
+
 
 void DE_exception();
 void DB_exception();
@@ -30,6 +32,8 @@ void XM_exception();
 void VE_exception();
 void SX_exception();
 void General_exception();
+extern void handle_system_call(void);
+int exception_flag;
 
 /* Make IDT initialized */
 void idt_init();

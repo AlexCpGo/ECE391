@@ -11,9 +11,17 @@
 #define R_A 0x8A
 #define R_B 0x8B
 #define R_C 0x8C
+#define IRQ8    8
 
 #define RTC     0x70
 #define CMOS    0x71
+
+#define MIN_FREQ 2
+#define MAX_FREQ 1024
+
+#define RTC_MASK 0xF0
+
+
 
 /* Initialize the RTC*/
 uint32_t rtc_init();

@@ -4,6 +4,7 @@
 
 .globl handle_keyboard
 .globl handle_rtc
+.globl handle_pit
 
 handle_keyboard:
     pushal
@@ -17,6 +18,14 @@ handle_rtc:
     pushal                          
     pushfl
     call rtc_interrupt                  
+    popfl              
+    popal                           
+    iret   
+
+handle_pit:
+    pushal                          
+    pushfl
+    call pit_interrupt
     popfl              
     popal                           
     iret   

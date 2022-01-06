@@ -1,4 +1,7 @@
 #include "page.h"
+#include "types.h"
+
+
 /*
  * init page table:
  *	description: initialize the page table, and page directory
@@ -44,7 +47,76 @@ void init_page_table() {
     page_directory[1].pde_4mb.base_addr = 0x1;
 
     // video mem
-    page_table[VID_ADDR].p = 1;
+    page_table[VID_ADDR >> OFFSET].p = 1;
+    // video mem backup for terminals
+    for (i = 1; i <= 3; i++)
+        page_table[(VID_ADDR + SIZE_4KB*i) >> OFFSET].p = 1;
+}
+
+/*
+ *  flush_tlb():
+ *	description: flushes tlb register
+ *	input: None
+ *	output: None
+ */
+void flush_tlb(void){
+    asm volatile(
+        // cr3, base addr
+        "movl %%cr3, %%eax    \n\
+         movl %%eax, %%cr3     \n\
+        "
+        :
+        :
+        :"eax"
+    );
+}
+
+/*
+ * enable_paging:
+ *	description: maps the address from physical address to the page directory in virtual
+ *               memory 
+ *	input: None
+ *	output: None
+ */
+void map_4mb_to_pd(uint32_t virt_addr, uint32_t phys_addr){
+    phys_addr = phys_addr >> 22;
+    uint32_t pd_idx;
+
+    pd_idx = virt_addr/SIZE_4MB;
+    //pd_idx =32;
+
+    // set present, user, read & write to 1 maybe need size too?
+    page_directory[pd_idx].pde_4mb.p = 1;
+    page_directory[pd_idx].pde_4mb.u_s = 1;
+    page_directory[pd_idx].pde_4mb.r_w = 1;
+    page_directory[pd_idx].pde_4mb.ps = 1;
+
+    // put in the base address for the user program
+    page_directory[pd_idx].pde_4mb.base_addr = phys_addr;
+    flush_tlb();
+
+}
+
+/*
+ * enable_paging:
+ *	description: maps the address from physical address to the page directory in virtual
+ *               memory 
+ *	input: None
+ *	output: None
+ */
+void map_4kb(uint32_t va, uint32_t pa) {
+    int pde = va >> 22;
+    page_directory[pde].pde_4kb.p = 1;
+    page_directory[pde].pde_4kb.u_s = 1;
+    page_directory[pde].pde_4kb.r_w = 1;
+    page_directory[pde].pde_4kb.base_addr =  (uint32_t)page_table >> OFFSET;
+
+    int pte = (va >> OFFSET) & 0x3ff;
+    page_table[pte].p = 1;
+    page_table[pte].r_w = 1;
+    page_table[pte].u_s = 1;
+    page_table[pte].base_addr = pa >> OFFSET;
+    flush_tlb();
 }
 
 /*
